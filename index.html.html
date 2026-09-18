@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | إدارة حضور الزفاف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #0b120e; color: #f2ebd9; margin: 0; padding: 20px; direction: rtl; }
+        .container { max-width: 900px; margin: 0 auto; background: rgba(20, 36, 26, 0.95); padding: 30px; border-radius: 12px; border: 1px solid #cda45e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1, h2 { color: #cda45e; text-align: center; }
+        .login-box { text-align: center; padding: 50px 0; }
+        input, button { padding: 12px 20px; margin: 10px; border-radius: 8px; border: 1px solid #cda45e; font-family: 'Tajawal', sans-serif; font-size: 16px; outline: none; }
+        input { background: #fff; color: #231c15; width: 250px; }
+        button { background: #cda45e; color: #14241a; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #f7e7c4; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid rgba(205,164,94,0.3); text-align: right; }
+        th { background: #14241a; color: #cda45e; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+        .badge-yes { color: #2ecc71; font-weight: bold; }
+        .badge-no { color: #e74c3c; font-weight: bold; }
+        #dashboardContent { display: none; }
+        .error-msg { color: #e74c3c; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- شاشة تسجيل الدخول بكلمة السر -->
+        <div id="loginSection" class="login-box">
+            <h2>تسجيل دخول لوحة التحكم</h2>
+            <p>الرجاء إدخال كلمة السر للمتابعة</p>
+            <input type="password" id="passwordInput" placeholder="كلمة السر...">
+            <br>
+            <button onclick="checkPassword()">دخول</button>
+            <div id="errorMsg" class="error-msg"></div>
+        </div>
+
+        <!-- محتوى الداشبورد (يظهر بعد كلمة السر الصحيحة) -->
+        <div id="dashboardContent">
+            <h1>قائمة المدعوين المؤكدين 💍</h1>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <button onclick="loadGuestsData()">تحديث البيانات 🔄</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>الاسم الكريم</th>
+                        <th>الحالة</th>
+                        <th>كلمة العرسان</th>
+                        <th>بصمة الجهاز (Device ID)</th>
+                    </tr>
+                </thead>
+                <tbody id="guestsTableBody">
+                    <tr><td colspan="5" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // كلمة السر الخاصة بالداشبورد (يمكنك تغييرها لما تريد)
+        const ADMIN_PASSWORD = "123456"; 
+
+        // بيانات الاتصال بقاعدة بيانات Supabase الخاصة بك
+        const SUPABASE_URL = 'https://glhamucxcqihocambytb.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_GXFtytqIlAZTley0bgamkQ_pe2ZnNkj';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function checkPassword() {
+            const inputVal = document.getElementById('passwordInput').value;
+            if (inputVal === ADMIN_PASSWORD) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                loadGuestsData();
+            } else {
+                document.getElementById('errorMsg').innerText = "كلمة السر غير صحيحة!";
+            }
+        }
+
+        async function loadGuestsData() {
+            const tbody = document.getElementById('guestsTableBody');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">جاري الجلب...</td></tr>`;
+
+            const { data, error } = await _supabase
+                .from('rsvp_guests')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">خطأ في جلب البيانات!</td></tr>`;
+                console.error(error);
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا يوجد مدعوين سجلوا حتى الآن.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            data.forEach((guest, index) => {
+                const statusText = guest.attendance === 'yes' ? '<span class="badge-yes">حاضر 🎉</span>' : '<span class="badge-no">اعتذر ❌</span>';
+                const row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${guest.name}</td>
+                    <td>${statusText}</td>
+                    <td>${guest.guest_wish || '-'}</td>
+                    <td style="font-size: 12px; color: #aaa;">${guest.device_id || 'غير متوفر'}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
