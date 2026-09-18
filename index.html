@@ -3,68 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | إدارة حضور الزفاف</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>لوحة التحكم الفاخرة | إدارة حضور الزفاف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #0b120e; color: #f2ebd9; margin: 0; padding: 20px; direction: rtl; }
-        .container { max-width: 1000px; margin: 0 auto; background: rgba(20, 36, 26, 0.95); padding: 30px; border-radius: 12px; border: 1px solid #cda45e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1, h2 { color: #cda45e; text-align: center; }
-        .login-box { text-align: center; padding: 50px 0; }
-        input, button { padding: 12px 20px; margin: 10px; border-radius: 8px; border: 1px solid #cda45e; font-family: 'Tajawal', sans-serif; font-size: 16px; outline: none; }
-        input { background: #fff; color: #231c15; width: 250px; }
-        button { background: #cda45e; color: #14241a; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #f7e7c4; }
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 800px; }
-        th, td { padding: 12px; border: 1px solid rgba(205,164,94,0.3); text-align: right; }
-        th { background: #14241a; color: #cda45e; }
-        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
-        .badge-yes { color: #2ecc71; font-weight: bold; }
-        .badge-no { color: #e74c3c; font-weight: bold; }
-        .badge-repeat { background: #d35400; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-right: 5px; display: inline-block; }
+        :root {
+            --bg-dark: #070d0a;
+            --container-bg: rgba(14, 27, 19, 0.95);
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --text-main: #f4eee1;
+            --accent-green: #27ae60;
+            --accent-red: #c0392b;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #102217 0%, #070d0a 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid var(--gold);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        h1, h2 {
+            color: var(--gold);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .login-box {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .login-box h2 { margin-bottom: 10px; }
+        .login-box p { color: #b5a993; margin-bottom: 20px; }
+
+        input[type="password"] {
+            padding: 14px 20px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px;
+            outline: none;
+            background: #fff;
+            color: #231c15;
+            width: 280px;
+            text-align: center;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+            color: #070d0a;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
         #dashboardContent { display: none; }
-        .error-msg { color: #e74c3c; margin-top: 10px; font-weight: bold; }
-        .stats-bar { display: flex; justify-content: space-around; background: #14241a; padding: 15px; border-radius: 8px; border: 1px solid rgba(205,164,94,0.3); margin-bottom: 20px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 20px; color: #cda45e; font-weight: bold; }
+
+        /* شريط الإحصائيات الفاخر */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(7, 13, 10, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .stat-card div:first-child {
+            font-size: 14px;
+            color: #b5a993;
+            margin-bottom: 5px;
+        }
+
+        .stat-num {
+            font-size: 26px;
+            color: var(--gold);
+            font-weight: 900;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            background: rgba(10, 20, 14, 0.9);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: right;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        th {
+            background: #0d1a12;
+            color: var(--gold);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        tr:hover {
+            background: rgba(212, 175, 55, 0.03);
+        }
+
+        .badge-yes {
+            color: #2ecc71;
+            font-weight: bold;
+            background: rgba(46, 204, 113, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .badge-no {
+            color: #e74c3c;
+            font-weight: bold;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .guest-id-tag {
+            background: #1e3324;
+            color: var(--gold-light);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .badge-repeat {
+            background: #d35400;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-right: 6px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .btn-delete {
+            background: #962d22;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- شاشة تسجيل الدخول بكلمة السر -->
+        <!-- شاشة تسجيل الدخول -->
         <div id="loginSection" class="login-box">
-            <h2>تسجيل دخول لوحة التحكم</h2>
-            <p>الرجاء إدخال كلمة السر للمتابعة</p>
+            <h2>🔐 لوحة تحكم عرسان آل مصلح</h2>
+            <p>الرجاء إدخال كلمة السر الخاصة للوصول إلى بيانات المدعوين</p>
             <input type="password" id="passwordInput" placeholder="كلمة السر...">
             <br>
-            <button onclick="checkPassword()">دخول</button>
+            <button onclick="checkPassword()">دخول لوحة التحكم</button>
             <div id="errorMsg" class="error-msg"></div>
         </div>
 
-        <!-- محتوى الداشبورد (يظهر بعد كلمة السر الصحيحة) -->
+        <!-- محتوى الداشبورد -->
         <div id="dashboardContent">
-            <h1>قائمة المدعوين المؤكدين 💍</h1>
+            <h1>💍 قائمة المدعوين المؤكدين لحفل الزفاف</h1>
             
             <!-- إحصائيات سريعة -->
             <div class="stats-bar">
-                <div class="stat-item">
-                    <div>إجمالي الردود</div>
+                <div class="stat-card">
+                    <div>إجمالي الردود المستلمة</div>
                     <div id="totalCount" class="stat-num">0</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-card">
                     <div>المؤكد حضورهم 🎉</div>
                     <div id="yesCount" class="stat-num" style="color: #2ecc71;">0</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-card">
                     <div>المعتذرون ❌</div>
                     <div id="noCount" class="stat-num" style="color: #e74c3c;">0</div>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span id="lastUpdated" style="font-size: 13px; color: #aaa;"></span>
+            <div class="action-bar">
+                <span id="lastUpdated" style="font-size: 13px; color: #b5a993;"></span>
                 <button onclick="loadGuestsData()">تحديث البيانات 🔄</button>
             </div>
 
@@ -73,15 +261,16 @@
                     <thead>
                         <tr>
                             <th>م</th>
+                            <th>رمز الضيف (ID)</th>
                             <th>الاسم الكريم</th>
                             <th>الحالة</th>
                             <th>كلمة العرسان</th>
-                            <th>وقت والتاريخ الإرسال</th>
-                            <th>بصمة الجهاز (Device ID)</th>
+                            <th>تاريخ ووقت الإرسال</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="guestsTableBody">
-                        <tr><td colspan="6" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                        <tr><td colspan="7" style="text-align: center; padding: 30px;">جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -89,12 +278,11 @@
     </div>
 
     <script>
-        // كلمة السر الخاصة بالداشبورد
         const ADMIN_PASSWORD = "123456"; 
 
-        // بيانات الاتصال بقاعدة بيانات Supabase الخاصة بك
+        // بيانات الاتصال بـ Supabase
         const SUPABASE_URL = 'https://glhamucxcqihocambytb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_GXFtytqIlAZTley0bgamkQ_pe2ZnNkj';
+        const SUPABASE_KEY = 'sb_publishable_GXFtytqIlAZTley0bgamkQ_pe2ZnNkj';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         function checkPassword() {
@@ -104,49 +292,42 @@ const SUPABASE_KEY = 'sb_publishable_GXFtytqIlAZTley0bgamkQ_pe2ZnNkj';
                 document.getElementById('dashboardContent').style.display = 'block';
                 loadGuestsData();
             } else {
-                document.getElementById('errorMsg').innerText = "كلمة السر غير صحيحة!";
+                document.getElementById('errorMsg').innerText = "كلمة السر غير صحيحة، حاول مرة أخرى.";
             }
         }
 
         async function loadGuestsData() {
             const tbody = document.getElementById('guestsTableBody');
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">جاري الجلب من قاعدة البيانات...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">جاري جلب البيانات من قاعدة البيانات...</td></tr>`;
 
             const { data, error } = await _supabase
                 .from('rsvp_guests')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true }); // ترتيب تصاعدي لتعيين أرقام مميزة ثابتة
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">خطأ في جلب البيانات من Supabase!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #e74c3c; padding: 20px;">خطأ في الاتصال بقاعدة البيانات! تأكد من إعدادات RLS.</td></tr>`;
                 console.error(error);
                 return;
             }
 
             if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا يوجد مدعوين سجلوا حتى الآن.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: #b5a993;">لا يوجد مدعوين سجلوا ردودهم حتى الآن.</td></tr>`;
                 document.getElementById('totalCount').innerText = 0;
                 document.getElementById('yesCount').innerText = 0;
                 document.getElementById('noCount').innerText = 0;
                 return;
             }
 
-            // حساب الإحصائيات ومعرفة التكرارات (سواء بنفس الاسم أو نفس Device ID)
             let yesTotal = 0;
             let noTotal = 0;
             
-            // خريطة لحساب عدد مرات تكرار كل اسم أو بصمة جهاز لمعرفة الإرسال المتكرر
-            const nameCounts = {};
+            // لحساب تكرار الأجهزة أو الأسماء
             const deviceCounts = {};
-            
             data.forEach(guest => {
                 if(guest.attendance === 'yes') yesTotal++;
                 else noTotal++;
 
-                if(guest.name) {
-                    const cleanName = guest.name.trim();
-                    nameCounts[cleanName] = (nameCounts[cleanName] || 0) + 1;
-                }
                 if(guest.device_id) {
                     deviceCounts[guest.device_id] = (deviceCounts[guest.device_id] || 0) + 1;
                 }
@@ -156,40 +337,72 @@ const SUPABASE_KEY = 'sb_publishable_GXFtytqIlAZTley0bgamkQ_pe2ZnNkj';
             document.getElementById('yesCount').innerText = yesTotal;
             document.getElementById('noCount').innerText = noTotal;
             
-            // عرض وقت آخر تحديث
             const now = new Date();
             document.getElementById('lastUpdated').innerText = `آخر تحديث: ${now.toLocaleDateString('ar-EG')} - ${now.toLocaleTimeString('ar-EG')}`;
 
             tbody.innerHTML = "";
+            
+            // خريطة لتوليد رموز مصغرة ثابتة لكل جهاز أو زير فريد
+            const deviceIdMap = {};
+            let idCounter = 1;
+
             data.forEach((guest, index) => {
+                // تعيين رمز مصغر لكل جهاز (مثل 1, 2, 3...)
+                let shortId = '-';
+                if(guest.device_id) {
+                    if(!deviceIdMap[guest.device_id]) {
+                        deviceIdMap[guest.device_id] = idCounter++;
+                    }
+                    shortId = `شخص #${deviceIdMap[guest.device_id]}`;
+                }
+
                 const statusText = guest.attendance === 'yes' ? '<span class="badge-yes">حاضر 🎉</span>' : '<span class="badge-no">اعتذر ❌</span>';
                 
-                // تنسيق التاريخ والوقت بشكل جميل ومقروء بالعربية
                 let formattedDate = '-';
                 if (guest.created_at) {
                     const d = new Date(guest.created_at);
                     formattedDate = `${d.toLocaleDateString('ar-EG')} | ${d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
                 }
 
-                // فحص ما إذا كان المدعو قد أرسل الرد أكثر من مرة (بناءً على تكرار الاسم أو Device ID)
+                // فحص ما إذا كان الجهاز أرسل ردود متعددة
                 let repeatBadge = '';
-                const isNameRepeated = guest.name && nameCounts[guest.name.trim()] > 1;
-                const isDeviceRepeated = guest.device_id && deviceCounts[guest.device_id] > 1;
-
-                if (isNameRepeated || isDeviceRepeated) {
-                    repeatBadge = `<span class="badge-repeat" title="قام بإرسال الرد أكثر من مرة">🔄 إعادة إرسال (${(nameCounts[guest.name?.trim()] || 1)})</span>`;
+                if(guest.device_id && deviceCounts[guest.device_id] > 1) {
+                    repeatBadge = `<span class="badge-repeat" title="هذا الجهاز أرسل ردوداً متعددة">🔄 مكرر (${deviceCounts[guest.device_id]})</span>`;
                 }
 
                 const row = `<tr>
                     <td>${index + 1}</td>
-                    <td>${guest.name || 'بدون اسم'} ${repeatBadge}</td>
+                    <td><span class="guest-id-tag">${shortId}</span></td>
+                    <td><strong>${guest.name || 'بدون اسم'}</strong> ${repeatBadge}</td>
                     <td>${statusText}</td>
                     <td>${guest.guest_wish || '-'}</td>
                     <td style="font-size: 13px; color: #e2d3b2;">${formattedDate}</td>
-                    <td style="font-size: 11px; color: #aaa; font-family: monospace;">${guest.device_id || 'غير متوفر'}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteGuest('${guest.id}')">حذف 🗑️</button>
+                    </td>
                 </tr>`;
                 tbody.innerHTML += row;
             });
+        }
+
+        // دالة حذف الرد من قاعدة البيانات
+        async function deleteGuest(id) {
+            if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الرد نهائياً؟")) {
+                return;
+            }
+
+            const { error } = await _supabase
+                .from('rsvp_guests')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert("حدث خطأ أثناء محاولة الحذف!");
+                console.error(error);
+            } else {
+                // إعادة تحميل البيانات بعد الحذف بنجاح
+                loadGuestsData();
+            }
         }
     </script>
 </body>
